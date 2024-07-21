@@ -8,11 +8,15 @@ Create a graph using the NetworkX library to model a specific real-world network
 
 Visualize the created graph and analyze its main characteristics (e.g., the number of nodes and edges, the degree of nodes).
 
+![Preview](./assets/result.png)
+
 ## Task 2
 
 Write a program that uses DFS and BFS algorithms to find paths in the graph developed in the first task.
 
 Then, compare the results of both algorithms for this graph, highlighting the differences in the obtained paths. Explain why the paths differ for each algorithm.
+
+> DFS and BFS traverse the graph differently, resulting in different paths. DFS goes deeper into the graph, visiting all neighboring vertices before moving to the next level, while BFS goes through the levels, visiting all vertices in the current level before moving to the next level. This is why the paths found by each algorithm may differ.
 
 ## Task 3
 

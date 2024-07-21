@@ -1,95 +1,50 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 
-# Create a graph
+# Graph of some roads Ukraine
 G = nx.Graph()
+G.add_nodes_from(['Kyiv', 'Kharkiv', 'Odessa', 'Dnipro', 'Donetsk'])
+G.add_edges_from([('Kyiv', 'Kharkiv'), ('Kyiv', 'Odessa'), ('Kyiv', 'Dnipro'), ('Kyiv', 'Donetsk'), ('Kharkiv', 'Odessa'), ('Kharkiv', 'Dnipro'), ('Odessa', 'Dnipro'),         ('Dnipro', 'Donetsk'), ('Donetsk', 'Kharkiv')])
 
-# Add nodes (e.g., bus stops)
-G.add_node("A", pos=(0, 0))
-G.add_node("B", pos=(1, 2))
-G.add_node("C", pos=(2, 3))
-G.add_node("D", pos=(3, 1))
+G['Kyiv']['Kharkiv']['weight'] = 469
+G['Kyiv']['Odessa']['weight'] = 475
+G['Kyiv']['Dnipro']['weight'] = 487
+G['Kyiv']['Donetsk']['weight'] = 688
+G['Kharkiv']['Odessa']['weight'] = 716
+G['Kharkiv']['Dnipro']['weight'] = 217
+G['Odessa']['Dnipro']['weight'] = 452
+G['Dnipro']['Donetsk']['weight'] = 248
+G['Donetsk']['Kharkiv']['weight'] = 304
 
-# Add edges (e.g., bus routes)
-G.add_edges_from([("A", "B"), ("A", "C"), ("B", "C"), ("C", "D")])
+# Print the number of nodes and edges in the graph
+print(f'Number of nodes: {G.number_of_nodes()}, number of edges: {G.number_of_edges()}')
 
-# Visualize the graph
-pos = nx.get_node_attributes(G, 'pos')
-nx.draw(G, pos, with_labels=True, node_size=500, node_color="skyblue", font_size=15, font_color="black", font_weight="bold")
+# Print degree centrality, closeness centrality, and betweenness centrality
+print(f'Degree Centrality: {nx.degree_centrality(G)}')
+print(f'Closeness Centrality: {nx.closeness_centrality(G)}')
+print(f'Betweenness Centrality: {nx.betweenness_centrality(G)}')
+
+# Plot the graph with edge labels
+plt.figure(figsize=(12, 6))
+labels = nx.get_edge_attributes(G, 'weight')
+pos = nx.circular_layout(G)
+
+# Set the coordinates of nodes
+pos['Odessa'] = (0.6, -0.5)
+pos['Donetsk'] = (1.9, -0.1)
+pos['Kharkiv'] = (1.7, 0.3)
+pos['Dnipro'] = (1.5, -0.1)
+pos['Kyiv'] = (0.7, 0.4)
+
+nx.draw(G, pos, with_labels=True, font_size=9,
+        node_size=2000, node_color='#FFFF87', font_weight='bold')
+
+# Load and display the SVG map as the background
+img = mpimg.imread("./assets/map.png")
+plt.imshow(img, extent=[-1, 2.5, -1, 1], alpha=0.5)
+
+nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
 plt.show()
 
-# Analyze graph characteristics
-print(f"Number of nodes: {G.number_of_nodes()}")
-print(f"Number of edges: {G.number_of_edges()}")
-print(f"Node degrees: {dict(G.degree())}")
-
-
-
-
-# DFS Implementation:
-
-def dfs(graph, start, path=[]):
-    path = path + [start]
-    for node in graph[start]:
-        if node not in path:
-            path = dfs(graph, node, path)
-    return path
-
-path_dfs = dfs(G, "A")
-print(f"DFS Path: {path_dfs}")
-
-# BFS Implementation:
-
-from collections import deque
-
-def bfs(graph, start):
-    visited = []
-    queue = deque([start])
-    while queue:
-        node = queue.popleft()
-        if node not in visited:
-            visited.append(node)
-            queue.extend(set(graph[node]) - set(visited))
-    return visited
-
-path_bfs = bfs(G, "A")
-print(f"BFS Path: {path_bfs}")
-
-# Implementing Dijkstra's Algorithm
-
-G.add_weighted_edges_from([("A", "B", 1.5), ("A", "C", 2.5), ("B", "C", 1.0), ("C", "D", 2.0)])
-
-def dijkstra(graph, start):
-    shortest_paths = {start: (None, 0)}
-    current_node = start
-    visited = set()
-
-    while current_node is not None:
-        visited.add(current_node)
-        destinations = graph[current_node]
-        weight_to_current_node = shortest_paths[current_node][1]
-
-        for next_node, weight in destinations.items():
-            weight = weight["weight"]
-            total_weight = weight_to_current_node + weight
-            if next_node not in shortest_paths:
-                shortest_paths[next_node] = (current_node, total_weight)
-            else:
-                current_shortest_weight = shortest_paths[next_node][1]
-                if current_shortest_weight > total_weight:
-                    shortest_paths[next_node] = (current_node, total_weight)
-
-        next_destinations = {node: shortest_paths[node] for node in shortest_paths if node not in visited}
-        if not next_destinations:
-            return shortest_paths
-
-        current_node = min(next_destinations, key=lambda k: next_destinations[k][1])
-
-    return shortest_paths
-
-shortest_paths = dijkstra(G, "A")
-print(shortest_paths)
-
-
-# Visualize Shortest Paths:
 
